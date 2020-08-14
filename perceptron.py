@@ -1,5 +1,4 @@
 class Perceptron:
-    """Basic perceptron with randomly generated weights"""
 
     def __init__(self, sign_threshold, inputs_count, learning_rate):
         self.sign_threshold = sign_threshold
