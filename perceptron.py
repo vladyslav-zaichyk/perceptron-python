@@ -4,8 +4,9 @@ class Perceptron:
     def __init__(self, sign_threshold, inputs_count, learning_rate):
         self.sign_threshold = sign_threshold
         self.inputs_count = inputs_count
-        self.weights = None
         self.learning_rate = learning_rate
+        self.weights = None
+        self.bias = None
 
     def guess(self, inputs):
         assert len(inputs) == self.inputs_count, \
@@ -23,11 +24,13 @@ class Perceptron:
         # Tune all the weights
         for i in range(self.inputs_count):
             self.weights[i] += error * inputs[i] * self.learning_rate
+        self.bias = error * 1 * self.learning_rate
 
     def __calc_sum(self, inputs):
         result = 0
         for i in range(self.inputs_count):
             result += inputs[i] * self.weights[i]
+        result += self.bias * 1
         return result
 
     # Activation function

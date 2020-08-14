@@ -1,5 +1,6 @@
 import tkinter
 import numpy
+import pickle
 from tkinter import colorchooser
 from tkinter import messagebox
 
@@ -10,7 +11,7 @@ from perceptron import Perceptron
 
 INPUTS_COUNT = 3
 SIGN_THRESHOLD = 255
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.001
 
 WEIGHTS_FILE = "weights.data"
 
@@ -47,17 +48,18 @@ class MainApp(tkinter.Frame):
         self.box.pack(side="top", fill="both", expand=True)
         # Perceptron initialization
         self.perceptron = Perceptron(SIGN_THRESHOLD, INPUTS_COUNT, LEARNING_RATE)
-        print(self.perceptron.weights)
 
-        # Load perceptron weights, if exist
+        # Load perceptron weights and bias, if exist
         try:
-            with open(WEIGHTS_FILE, 'r') as weights_file:
-                self.perceptron.weights = numpy.fromfile(weights_file)
+            with open(WEIGHTS_FILE, 'rb') as file:
+                self.perceptron.weights, self.perceptron.bias = pickle.load(file)
         except IOError:
-            print("Weights not found, they will be generated randomly")
+            warning = "Perceptron data not found, weights and bias will be generated randomly." \
+                      " Try to train it properly!"
+            print(warning)
+            self.alert('Weights not found', warning, kind='info')
             self.perceptron.weights = numpy.random.rand(INPUTS_COUNT)
-
-        print(self.perceptron.weights)
+            self.perceptron.bias = numpy.random.rand(1)
         color_chooser_button = tkinter.Button(self,
                                               text="Pick a color!",
                                               command=lambda: self.choose_color_dialog())
@@ -99,6 +101,14 @@ class MainApp(tkinter.Frame):
         guessed_text_color = self.__guess_text_color(bg_color)
         self.__change_colors(bg_color, guessed_text_color)
 
+    @staticmethod
+    def alert(title, message, kind='info'):
+        if kind not in ('error', 'warning', 'info'):
+            raise ValueError('Unsupported alert kind.')
+
+        show_method = getattr(messagebox, 'show{}'.format(kind))
+        show_method(title, message)
+
     def __guess_text_color(self, bg_color):
         guess = self.perceptron.guess(hex2rgb(bg_color))
         return "black" if guess > 0 else "white"
@@ -111,10 +121,9 @@ class MainApp(tkinter.Frame):
 
 def on_closing(perceptron):
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        # Write current perceptron weights to a file
-        with open(WEIGHTS_FILE, "w") as weights_file:
-            print(perceptron.weights)
-            perceptron.weights.tofile(weights_file)
+        # Write current perceptron weights and bias to a file
+        with open(WEIGHTS_FILE, "wb") as file:
+            pickle.dump([perceptron.weights, perceptron.bias], file)
         root.destroy()
 
 
