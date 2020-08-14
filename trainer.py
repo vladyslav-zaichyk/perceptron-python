@@ -1,4 +1,7 @@
-# 0 stands for white, 1 stands for black
+from util.color_util import hex2rgb
+
+# keys: hex colors, values: perceptron target
+# -1 stands for white color, 1 stands for black color
 color_set = {
     "#800000": -1,
     "#993333": -1,
@@ -23,12 +26,7 @@ color_set = {
 }
 
 
-def hex2rgb(value):
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
-
-
-def train2pick_colours(perceptron, train_data):
+def train_perceptron(perceptron, train_data):
+    """Feeds train data to a perceptron"""
     for key, value in train_data.items():
         perceptron.learn(hex2rgb(key), value)
