@@ -129,10 +129,7 @@ def on_closing(perceptron):
 
 if __name__ == '__main__':
     root = tkinter.Tk()
-
     root.title("RGB Perceptron")
-    icon = tkinter.PhotoImage(file='icon.png')
-    root.wm_iconphoto(False, icon)
     app = MainApp(root)
 
     app.pack(side="top", fill="both", expand=True)
